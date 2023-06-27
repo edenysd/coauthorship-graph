@@ -1,3 +1,4 @@
 /target
 src/main.rs
-input.csv
+CoAuthorshipNet.ipynb
+/calculated-data/*
