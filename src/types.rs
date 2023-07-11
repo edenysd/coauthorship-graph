@@ -1,4 +1,5 @@
 use serde::Deserialize;
+use ustr::Ustr;
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct Publication {
@@ -24,7 +25,7 @@ pub struct Publication {
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct SimplePublication {
-    pub author_name: String,
+    pub author_name: Ustr,
     #[serde(skip_deserializing)]
-    pub coauthors: Vec<String>,
+    pub coauthors: Vec<Ustr>,
 }

@@ -2,6 +2,8 @@ use crate::types::SimplePublication;
 use csv::Reader;
 use std::{error::Error, fs::File, vec};
 
+use ustr::Ustr;
+
 const CSV_PATH: &str = "input.csv";
 
 fn create_reader() -> Result<Reader<File>, Box<dyn Error>> {
@@ -10,6 +12,7 @@ fn create_reader() -> Result<Reader<File>, Box<dyn Error>> {
         .has_headers(true)
         .flexible(true)
         .from_path(CSV_PATH)?;
+
     Ok(rdr)
 }
 
@@ -45,9 +48,13 @@ pub fn read_publication_list() -> Result<Vec<SimplePublication>, Box<dyn Error>>
         vec_string = vec_string.replace("'", "\"");
         vec_string = vec_string.replace("\\\"", "'");
 
-        record.coauthors = serde_json::from_str::<Vec<String>>(&vec_string)?;
+        record.coauthors = serde_json::from_str::<Vec<Ustr>>(&vec_string)?;
 
         pub_list.push(record);
+
+        if pub_list.len() > 1000000 {
+            break;
+        }
     }
 
     Ok(pub_list)
