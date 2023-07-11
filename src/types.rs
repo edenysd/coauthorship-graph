@@ -16,6 +16,15 @@ pub struct Publication {
     pub coauthor_affliations: String,
     pub venue: String,
     pub pub_year: String,
+    #[serde(skip_deserializing)]
     pub paper_title: String,
+    #[serde(skip_deserializing)]
     pub paper_abstract: String,
+}
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct SimplePublication {
+    pub author_name: String,
+    #[serde(skip_deserializing)]
+    pub coauthors: Vec<String>,
 }

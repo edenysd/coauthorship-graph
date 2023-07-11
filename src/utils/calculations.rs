@@ -1,9 +1,9 @@
 use std::collections::BTreeMap;
 
-use crate::types::Publication;
+use crate::types::SimplePublication;
 
 pub fn calculate_exclusivity_per_pub(
-    pub_list: &Vec<Publication>,
+    pub_list: &Vec<SimplePublication>,
 ) -> BTreeMap<&String, BTreeMap<&String, Vec<(usize, f64)>>> {
     let mut exclusivity_per_pub = BTreeMap::<&String, BTreeMap<&String, Vec<(usize, f64)>>>::new();
 
@@ -20,10 +20,9 @@ pub fn calculate_exclusivity_per_pub(
                             Some(v) => v,
                             None => {
                                 v.insert(&author_b, Vec::<(usize, f64)>::new());
-                                v.get_mut(&author_b).unwrap()
+                                v.get_mut(&author_b).expect("failt to insert 2 key")
                             }
                         },
-
                         None => {
                             exclusivity_per_pub
                                 .insert(&author_a, BTreeMap::<&String, Vec<(usize, f64)>>::new());
@@ -37,6 +36,9 @@ pub fn calculate_exclusivity_per_pub(
             }
         }
         pub_index += 1;
+        if pub_index % 100000 == 0 {
+            println!("{}", pub_index);
+        }
     }
     exclusivity_per_pub
 }

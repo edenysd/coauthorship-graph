@@ -9,7 +9,7 @@ use std::{
     process,
 };
 
-fn execute_calculations(pub_list: Vec<types::Publication>, path_dir: String) {
+fn execute_calculations(pub_list: Vec<types::SimplePublication>, path_dir: String) {
     println!("calculating exclusivity_per_pub");
     let exclusivity_per_pub = utils::calculations::calculate_exclusivity_per_pub(&pub_list);
     serde_json::to_writer_pretty(

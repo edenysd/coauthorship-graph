@@ -1,4 +1,4 @@
-use crate::types::Publication;
+use crate::types::SimplePublication;
 use csv::Reader;
 use std::{error::Error, fs::File, vec};
 
@@ -13,7 +13,7 @@ fn create_reader() -> Result<Reader<File>, Box<dyn Error>> {
     Ok(rdr)
 }
 
-pub fn read_publication_list() -> Result<Vec<Publication>, Box<dyn Error>> {
+pub fn read_publication_list() -> Result<Vec<SimplePublication>, Box<dyn Error>> {
     let mut pub_list = vec![];
 
     // Build the CSV reader and iterate over each record.
@@ -22,17 +22,26 @@ pub fn read_publication_list() -> Result<Vec<Publication>, Box<dyn Error>> {
     for result in rdr.records().into_iter() {
         // The iterator yields Result<StringRecord, Error>, so we check the
         // error here.
-        let line = result?;
-
-        let mut record: Publication = match line.clone().deserialize::<Publication>(None) {
+        let line = match result {
             Err(err) => {
-                println!("error running example: {}\n in line {:?}", err, line);
+                println!("error parsing: {}", err);
                 continue;
             }
             Ok(v) => v,
         };
 
+        let mut record: SimplePublication =
+            match line.clone().deserialize::<SimplePublication>(None) {
+                Err(err) => {
+                    println!("error running example: {}\n in line {:?}", err, line);
+                    continue;
+                }
+                Ok(v) => v,
+            };
+
         let mut vec_string = line[9].to_string();
+
+        vec_string = vec_string.replace("\"", "\\\'");
         vec_string = vec_string.replace("'", "\"");
         vec_string = vec_string.replace("\\\"", "'");
 
