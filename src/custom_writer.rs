@@ -22,7 +22,7 @@ pub fn write_exclusivity_per_pub(
 
 pub fn write_co_authorship_freq(co_authorship_freq: UstrMap<UstrMap<f64>>, path_dir: &String) {
     println!("Init writer for co_authorship_freq");
-    serde_json::to_writer(
+    serde_json::to_writer_pretty(
         BufWriter::with_capacity(
             1000000,
             File::create(path_dir.clone() + "co_authorship_freq.json")
@@ -40,7 +40,7 @@ pub fn write_total_co_authorship_freq_per_author(
     path_dir: &String,
 ) {
     println!("Init writer for total_co_authorship_freq_per_author");
-    serde_json::to_writer(
+    serde_json::to_writer_pretty(
         BufWriter::with_capacity(
             1000000,
             File::create(path_dir.clone() + "total_co_authorship_freq_per_author.json")
@@ -55,7 +55,7 @@ pub fn write_total_co_authorship_freq_per_author(
 
 pub fn write_normalized_weights(normalized_weights: UstrMap<UstrMap<f64>>, path_dir: &String) {
     println!("Init writer for normalized_weights");
-    serde_json::to_writer(
+    serde_json::to_writer_pretty(
         BufWriter::with_capacity(
             1000000,
             File::create(path_dir.clone() + "normalized_weights.json")
