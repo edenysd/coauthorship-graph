@@ -52,9 +52,9 @@ pub fn read_publication_list() -> Result<Vec<SimplePublication>, Box<dyn Error>>
 
         pub_list.push(record);
 
-        if pub_list.len() > 1000000 {
-            break;
-        }
+        // if pub_list.len() > 1000000 {
+        //     break;
+        // }
     }
 
     Ok(pub_list)
