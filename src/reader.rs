@@ -34,16 +34,14 @@ pub fn read_publication_list() -> Result<Vec<SimplePublication>, Box<dyn Error>>
             Ok(v) => v,
         };
 
-        let mut record: SimplePublication = match line
-            .clone()
-            .deserialize::<SimplePublication>(Some(&headers))
-        {
-            Err(err) => {
-                println!("error running example: {}\n in line {:?}", err, line);
-                continue;
-            }
-            Ok(v) => v,
-        };
+        let mut record: SimplePublication =
+            match line.deserialize::<SimplePublication>(Some(&headers)) {
+                Err(err) => {
+                    println!("error running example: {}\n in line {:?}", err, line);
+                    continue;
+                }
+                Ok(v) => v,
+            };
 
         let mut vec_string = line[9].to_string();
 

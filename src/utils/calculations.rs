@@ -21,7 +21,7 @@ pub fn calculate_exclusivity_per_pub(
                         Some(v) => match v.get_mut(&author_b) {
                             Some(v) => v,
                             None => {
-                                v.insert(*author_b.pr, Vec::<(u16, f32)>::default());
+                                v.insert(*author_b, Vec::<(u16, f32)>::default());
                                 v.get_mut(&author_b).expect("failt to insert 2 key")
                             }
                         },
