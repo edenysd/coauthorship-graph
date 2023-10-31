@@ -3,6 +3,8 @@ mod reader;
 mod types;
 mod utils;
 
+use ustr::Ustr;
+
 use crate::{
     custom_writer::{
         write_co_authorship_freq, write_exclusivity_per_pub, write_normalized_weights,
@@ -14,30 +16,28 @@ use std::{fs::create_dir, path::Path, process};
 
 fn execute_calculations(pub_list: Vec<types::SimplePublication>, path_dir: String) {
     println!("calculating exclusivity_per_pub");
-    let exclusivity_per_pub = utils::calculations::calculate_exclusivity_per_pub(&pub_list);
+    let exclusivity_per_pub = utils::calculations::calculate_exclusivity_per_pub(pub_list);
     println!("exclusivity_per_pub finished");
+    write_exclusivity_per_pub(&exclusivity_per_pub, &path_dir);
 
     println!("calculating co_authorship_freq");
-    let co_authorship_freq =
-        utils::calculations::calculate_co_authorship_freq(&exclusivity_per_pub);
+    let co_authorship_freq = utils::calculations::calculate_co_authorship_freq(exclusivity_per_pub);
     println!("co_authorship_freq finished");
+    write_co_authorship_freq(&co_authorship_freq, &path_dir);
 
     println!("calculating total_co_authorship_freq_per_author");
     let total_co_authorship_freq_per_author =
         utils::calculations::calculate_total_co_authorship_freq_per_author(&co_authorship_freq);
     println!("total_co_authorship_freq_per_author finished");
+    write_total_co_authorship_freq_per_author(&total_co_authorship_freq_per_author, &path_dir);
 
     println!("calculating normalized_weights");
     let normalized_weights = utils::calculations::calculate_normalized_weights(
-        &co_authorship_freq,
-        &total_co_authorship_freq_per_author,
+        co_authorship_freq,
+        total_co_authorship_freq_per_author,
     );
     println!("normalized_weights finished");
-
-    write_exclusivity_per_pub(exclusivity_per_pub, &path_dir);
-    write_co_authorship_freq(co_authorship_freq, &path_dir);
-    write_total_co_authorship_freq_per_author(total_co_authorship_freq_per_author, &path_dir);
-    write_normalized_weights(normalized_weights, &path_dir);
+    write_normalized_weights(&normalized_weights, &path_dir);
 }
 
 fn main() {

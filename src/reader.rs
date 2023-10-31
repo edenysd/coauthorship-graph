@@ -21,6 +21,7 @@ pub fn read_publication_list() -> Result<Vec<SimplePublication>, Box<dyn Error>>
 
     // Build the CSV reader and iterate over each record.
     let mut rdr = create_reader()?;
+    let headers = rdr.headers()?.clone();
 
     for result in rdr.records().into_iter() {
         // The iterator yields Result<StringRecord, Error>, so we check the
@@ -33,14 +34,16 @@ pub fn read_publication_list() -> Result<Vec<SimplePublication>, Box<dyn Error>>
             Ok(v) => v,
         };
 
-        let mut record: SimplePublication =
-            match line.clone().deserialize::<SimplePublication>(None) {
-                Err(err) => {
-                    println!("error running example: {}\n in line {:?}", err, line);
-                    continue;
-                }
-                Ok(v) => v,
-            };
+        let mut record: SimplePublication = match line
+            .clone()
+            .deserialize::<SimplePublication>(Some(&headers))
+        {
+            Err(err) => {
+                println!("error running example: {}\n in line {:?}", err, line);
+                continue;
+            }
+            Ok(v) => v,
+        };
 
         let mut vec_string = line[9].to_string();
 
@@ -51,10 +54,6 @@ pub fn read_publication_list() -> Result<Vec<SimplePublication>, Box<dyn Error>>
         record.coauthors = serde_json::from_str::<Vec<Ustr>>(&vec_string)?;
 
         pub_list.push(record);
-
-        // if pub_list.len() > 1000000 {
-        //     break;
-        // }
     }
 
     Ok(pub_list)

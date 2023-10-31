@@ -3,3 +3,7 @@ src/main.rs
 CoAuthorshipNet.ipynb
 /calculated-data/*
 input.csv
+saved_calculated-data/co_authorship_freq.json
+saved_calculated-data/exclusivity_per_pub.json
+saved_calculated-data/normalized_weights.json
+saved_calculated-data/total_co_authorship_freq_per_author.json
