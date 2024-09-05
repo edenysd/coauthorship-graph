@@ -4,7 +4,7 @@ use std::{error::Error, fs::File, vec};
 
 use ustr::Ustr;
 
-const CSV_PATH: &str = "input.csv";
+const CSV_PATH: &str = "lagos-and-dataset-in-block.csv";
 
 fn create_reader() -> Result<Reader<File>, Box<dyn Error>> {
     // Build the CSV reader

@@ -3,21 +3,6 @@ use std::{fs::File, io::BufWriter};
 
 use ustr::UstrMap;
 
-pub fn write_exclusivity_per_pub<T: Serialize>(exclusivity_per_pub: &T, path_dir: &String) {
-    println!("Init writer for exclusivity_per_pub");
-    serde_json::to_writer(
-        BufWriter::with_capacity(
-            1000000,
-            File::create(path_dir.clone() + "exclusivity_per_pub.json")
-                .expect("Failed to create file."),
-        ),
-        &exclusivity_per_pub,
-    )
-    .expect("Failed to write file");
-
-    println!("Finish writer for exclusivity_per_pub");
-}
-
 pub fn write_co_authorship_freq(co_authorship_freq: &UstrMap<UstrMap<f32>>, path_dir: &String) {
     println!("Init writer for co_authorship_freq");
     serde_json::to_writer(

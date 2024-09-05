@@ -2,10 +2,11 @@ use ustr::UstrMap;
 
 use crate::types::SimplePublication;
 
-pub fn calculate_exclusivity_per_pub(
+//@TODO use Entry API instead custom checkers
+pub fn calculate_exclusivity_per_pub_plus_calculate_co_authorship_freq(
     pub_list: Vec<SimplePublication>,
-) -> UstrMap<UstrMap<Vec<(u16, f32)>>> {
-    let mut exclusivity_per_pub = UstrMap::<UstrMap<Vec<(u16, f32)>>>::default();
+) -> UstrMap<UstrMap<f32>> {
+    let mut exclusivity_per_pub = UstrMap::<UstrMap<f32>>::default();
 
     let mut pub_index: usize = 0;
     let mut amount_of_entries: usize = 0;
@@ -17,25 +18,28 @@ pub fn calculate_exclusivity_per_pub(
         for author_a in coauthors {
             for author_b in coauthors {
                 if author_a != author_b {
-                    let set = match exclusivity_per_pub.get_mut(&author_a) {
+                    let cur_value = match exclusivity_per_pub.get_mut(&author_a) {
                         Some(v) => match v.get_mut(&author_b) {
-                            Some(v) => v,
+                            Some(cur_value) => *cur_value,
                             None => {
-                                v.insert(*author_b, Vec::<(u16, f32)>::default());
-                                v.get_mut(&author_b).expect("failt to insert 2 key")
+                                v.insert(*author_b, 0.0);
+                                0.0
                             }
                         },
                         None => {
                             amount_of_pairs += 1;
-                            exclusivity_per_pub
-                                .insert(*author_a, UstrMap::<Vec<(u16, f32)>>::default());
+                            exclusivity_per_pub.insert(*author_a, UstrMap::<f32>::default());
                             let temp_map = exclusivity_per_pub.get_mut(&author_a).unwrap();
-                            temp_map.insert(*author_b, Vec::<(u16, f32)>::new());
-                            temp_map.get_mut(&author_b).unwrap()
+                            temp_map.insert(*author_b, 0.0);
+                            0.0
                         }
                     };
+                    exclusivity_per_pub
+                        .get_mut(&author_a)
+                        .unwrap()
+                        .insert(*author_b, cur_value + 1.0 / (number_of_authors - 1.0));
+
                     amount_of_entries += 1;
-                    set.push((pub_index as u16, 1.0 / (number_of_authors - 1.0)));
                 }
             }
         }
@@ -53,40 +57,11 @@ pub fn calculate_exclusivity_per_pub(
     exclusivity_per_pub
 }
 
-pub fn calculate_co_authorship_freq<'a>(
-    exclusivity_per_pub: UstrMap<UstrMap<Vec<(u16, f32)>>>,
-) -> UstrMap<UstrMap<f32>> {
-    let mut co_authorship_freq = UstrMap::<UstrMap<f32>>::default();
-    let mut pub_index = 0;
-    for (author_a, map) in exclusivity_per_pub {
-        let mut sum = 0.0;
-
-        for (author_b, v) in map {
-            for (_, exclusivity_value) in v {
-                sum += exclusivity_value;
-            }
-
-            if co_authorship_freq.contains_key(&author_a) == false {
-                co_authorship_freq.insert(author_a, UstrMap::<f32>::default());
-            }
-            co_authorship_freq
-                .get_mut(&author_a)
-                .unwrap()
-                .insert(author_b, sum);
-        }
-        pub_index += 1;
-        if pub_index % 100000 == 0 {
-            println!("{}", pub_index);
-        }
-    }
-    co_authorship_freq
-}
-
 pub fn calculate_total_co_authorship_freq_per_author<'a>(
     co_authorship_freq: &UstrMap<UstrMap<f32>>,
 ) -> UstrMap<f32> {
     let mut total_co_authorship_freq_per_author = UstrMap::<f32>::default();
-    let mut pub_index = 0;
+    let mut author_index = 0;
     for (author_a, map) in co_authorship_freq {
         for (_, v) in map {
             let mut cur_val = total_co_authorship_freq_per_author
@@ -97,9 +72,9 @@ pub fn calculate_total_co_authorship_freq_per_author<'a>(
             cur_val += v;
             total_co_authorship_freq_per_author.insert(*author_a, cur_val);
         }
-        pub_index += 1;
-        if pub_index % 100000 == 0 {
-            println!("{}", pub_index);
+        author_index += 1;
+        if author_index % 100000 == 0 {
+            println!("{}", author_index);
         }
     }
     total_co_authorship_freq_per_author
@@ -110,7 +85,7 @@ pub fn calculate_normalized_weights<'a>(
     total_co_authorship_freq_per_author: UstrMap<f32>,
 ) -> UstrMap<UstrMap<f32>> {
     let mut normalized_weights = UstrMap::<UstrMap<f32>>::default();
-    let mut pub_index = 0;
+    let mut author_index = 0;
     for (author_a, map) in co_authorship_freq {
         for (author_b, v) in map {
             if normalized_weights.contains_key(&author_a) == false {
@@ -121,9 +96,9 @@ pub fn calculate_normalized_weights<'a>(
                 v / total_co_authorship_freq_per_author.get(&author_a).unwrap(),
             );
         }
-        pub_index += 1;
-        if pub_index % 100000 == 0 {
-            println!("{}", pub_index);
+        author_index += 1;
+        if author_index % 100000 == 0 {
+            println!("{}", author_index);
         }
     }
     normalized_weights

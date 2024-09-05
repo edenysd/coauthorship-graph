@@ -3,11 +3,9 @@ mod reader;
 mod types;
 mod utils;
 
-use ustr::Ustr;
-
 use crate::{
     custom_writer::{
-        write_co_authorship_freq, write_exclusivity_per_pub, write_normalized_weights,
+        write_co_authorship_freq, write_normalized_weights,
         write_total_co_authorship_freq_per_author,
     },
     reader::read_publication_list,
@@ -15,14 +13,13 @@ use crate::{
 use std::{fs::create_dir, path::Path, process};
 
 fn execute_calculations(pub_list: Vec<types::SimplePublication>, path_dir: String) {
-    println!("calculating exclusivity_per_pub");
-    let exclusivity_per_pub = utils::calculations::calculate_exclusivity_per_pub(pub_list);
-    println!("exclusivity_per_pub finished");
-    write_exclusivity_per_pub(&exclusivity_per_pub, &path_dir);
+    println!("calculating exclusivity_per_pub + co_authorship_freq");
+    let co_authorship_freq =
+        utils::calculations::calculate_exclusivity_per_pub_plus_calculate_co_authorship_freq(
+            pub_list,
+        );
+    println!("calculating exclusivity_per_pub + co_authorship_freq finished");
 
-    println!("calculating co_authorship_freq");
-    let co_authorship_freq = utils::calculations::calculate_co_authorship_freq(exclusivity_per_pub);
-    println!("co_authorship_freq finished");
     write_co_authorship_freq(&co_authorship_freq, &path_dir);
 
     println!("calculating total_co_authorship_freq_per_author");
