@@ -2,7 +2,7 @@ use ustr::UstrMap;
 
 use crate::types::SimplePublication;
 
-//@TODO use Entry API instead custom checkers
+// @TODO: use Entry API instead custom checkers
 pub fn calculate_exclusivity_per_pub_plus_calculate_co_authorship_freq(
     pub_list: Vec<SimplePublication>,
 ) -> UstrMap<UstrMap<f32>> {
@@ -57,6 +57,13 @@ pub fn calculate_exclusivity_per_pub_plus_calculate_co_authorship_freq(
     exclusivity_per_pub
 }
 
+
+/**
+ *  Calculated total coauthorship freq is equivalent to the number of publications since 
+ *  this calculation is the accumulative sum of N frequencies where N is the number of publications.
+ *  The method was created as a exact replications of the original algorithm but isn't needed for 
+ *  performant tasks.
+ */
 pub fn calculate_total_co_authorship_freq_per_author<'a>(
     co_authorship_freq: &UstrMap<UstrMap<f32>>,
 ) -> UstrMap<f32> {
